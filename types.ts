@@ -33,4 +33,5 @@ type Listing = {
     address: Address;
     property_type: PropertyType;
     listing_status: ListingStatus;
+    price_cut: number;
 }
