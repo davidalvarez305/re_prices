@@ -1,33 +1,20 @@
 import zipcodes from "zipcodes";
-import { Builder, By } from "selenium-webdriver";
+import { Builder, By, WebDriver } from "selenium-webdriver";
 import firefox from "selenium-webdriver/firefox";
 
-const zip_codes = zipcodes.lookupByName("Miami", "FL");
-
-async function main() {
-  // Create a new WebDriver instance (make sure you have the appropriate driver executable installed)
-  // Set Firefox options
-  const options = new firefox.Options();
-  // options.headless();
-
-  // Create a new WebDriver instance
-  const driver = await new Builder()
-    .setFirefoxOptions(options)
-    .forBrowser("firefox")
-    .build();
-
+async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
   try {
-    // Navigate to the page
-    await driver.get("https://www.zillow.com/hialeah-fl-33012/");
+    await driver.get(url);
 
     let prev = 0;
-    for (let i = 500; i < 2000; i += 500) {
+    for (let i = 500; i < 3000; i += 500) {
       // Scroll to the bottom of the page
       await driver.executeScript(
         `document.getElementById('search-page-list-container').scrollBy(${prev}, ${i})`
       );
+
       // Wait for a brief moment (optional)
-      await driver.sleep(2000);
+      await driver.sleep(1000);
 
       prev = i;
 
@@ -36,11 +23,11 @@ async function main() {
 
     const properties: Listing[] = [];
 
-    // Find elements with the specified class
+    /* // Find elements with the specified class
     const grid = await driver.findElement(By.id("grid-search-results"));
 
     // Process and log the elements
-    if (!grid) return;
+    if (!grid) return [];
 
     const listings = await grid.findElements(By.css("li"));
 
@@ -53,7 +40,7 @@ async function main() {
         );
         const listing_price = await el.getText();
 
-        if (listing_price === "") return;
+        if (listing_price === "") return [];
 
         const card = await element.findElement(
           By.css(".StyledPropertyCardDataWrapper-c11n-8-84-0__sc-1omp4c3-0")
@@ -125,7 +112,7 @@ async function main() {
             price_cut = cut;
           }
         } catch (err) {
-          console.error(err);
+          throw new Error(err as any);
         }
 
         listing.property_type = {
@@ -134,12 +121,43 @@ async function main() {
 
         listing.price_cut = price_cut;
         properties.push(listing);
-      } catch (err) {}
-    }
+      } catch (err) {
+        throw new Error(err as any);
+      }
+    } */
 
-    console.log(properties.length);
+    const pagination = await driver.findElement(By.css('a[title="Next page"]'));
+
+    await pagination.click();
+
+    // Wait for a brief moment (optional)
+    await driver.sleep(3000);
+    return properties;
   } catch (err) {
-    console.error(err);
+    throw new Error(err as any);
+  }
+}
+
+async function main() {
+  // Create a new WebDriver instance (make sure you have the appropriate driver executable installed)
+  // Set Firefox options
+  const options = new firefox.Options();
+  // options.headless();
+
+  // Create a new WebDriver instance
+  const driver = await new Builder()
+    .setFirefoxOptions(options)
+    .forBrowser("firefox")
+    .build();
+
+  try {
+    // const zip_codes = zipcodes.lookupByName("Miami", "FL");
+    const url = "https://www.zillow.com/hialeah-fl-33016/";
+
+    const listings = await getPrices(driver, url);
+    console.log(listings.length);
+  } finally {
+    // await driver.close();
   }
 }
 
