@@ -23,7 +23,7 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
 
     const properties: Listing[] = [];
 
-    /* // Find elements with the specified class
+    // Find elements with the specified class
     const grid = await driver.findElement(By.id("grid-search-results"));
 
     // Process and log the elements
@@ -124,7 +124,7 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
       } catch (err) {
         throw new Error(err as any);
       }
-    } */
+    }
 
     const pagination = await driver.findElement(By.css('a[title="Next page"]'));
 
