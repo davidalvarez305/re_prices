@@ -20,14 +20,19 @@ async function main() {
     // Navigate to the page
     await driver.get("https://www.zillow.com/hialeah-fl-33012/");
 
-    // Wait for a brief moment (optional)
-    await driver.sleep(2000);
+    let prev = 0;
+    for (let i = 500; i < 2000; i += 500) {
+      // Scroll to the bottom of the page
+      await driver.executeScript(
+        `document.getElementById('search-page-list-container').scrollBy(${prev}, ${i})`
+      );
+      // Wait for a brief moment (optional)
+      await driver.sleep(2000);
 
-    // Scroll to the bottom of the page
-    await driver.executeScript('window.scrollTo(0, document.body.scrollHeight)');
+      prev = i;
 
-    // Wait for a brief moment (optional)
-    await driver.sleep(2000);
+      console.log(i);
+    }
 
     const properties: Listing[] = [];
 
@@ -55,9 +60,11 @@ async function main() {
         );
 
         let typeOfProperty = "";
-        const forSale = await element.findElement(
-          By.css(".StyledPropertyCardDataArea-c11n-8-84-0__sc-yipmu-0.exsYeB")
-        ).getText()
+        const forSale = await element
+          .findElement(
+            By.css(".StyledPropertyCardDataArea-c11n-8-84-0__sc-yipmu-0.exsYeB")
+          )
+          .getText();
 
         typeOfProperty = forSale.split("-")[1].split(" for ")[0].trim();
 
@@ -133,8 +140,6 @@ async function main() {
     console.log(properties.length);
   } catch (err) {
     console.error(err);
-  } finally {
-    await driver.close();
   }
 }
 
