@@ -39,6 +39,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.3.0.tgz#719498898d5defab83c3560f45d8498f58d11938"
   integrity sha512-cumHmIAf6On83X7yP+LrsEyUOf/YlociZelmpRYaGFydoaPdxdt80MAbu6vWerQT2COCp2nPvHdsbD7tHn/YlQ==
 
+"@types/zipcodes@^8.0.3":
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/@types/zipcodes/-/zipcodes-8.0.3.tgz#5ccb68475a0520f8a15f7e9c18d34e21ba48f6e1"
+  integrity sha512-XjM01lB9SaBKiUtRnKaK/S7nfjXS7mrjtIhwcltsRZRnjaPFmViac+SkStplHOCjf5DD17GbIBb4VUCIxm/FAw==
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -884,3 +889,8 @@ yargs@^17.6.2:
     string-width "^4.2.3"
     y18n "^5.0.5"
     yargs-parser "^21.1.1"
+
+zipcodes@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/zipcodes/-/zipcodes-8.0.0.tgz#4d124cdeedfc693f1b0ef8060323f206aeb98a9b"
+  integrity sha512-V8NolFaJhsPamGeCv5lJdk60Q7JBiXI6e+8JDksPC1NJWZ0t7g1OFfqVLZb2Nc2F5jmf9JTdYdWJBnIhGBvtbA==

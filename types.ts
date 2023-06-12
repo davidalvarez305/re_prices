@@ -14,7 +14,6 @@ type ZipCode = {
 
 type Address = {
     address_line_one: string;
-    address_line_two: string;
     zip_code: ZipCode;
 };
 

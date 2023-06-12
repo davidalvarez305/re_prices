@@ -1,7 +1,6 @@
 import axios from "axios";
+import zipcodes from "zipcodes";
 import cheerio from "cheerio";
-
-const url = `https://www.zillow.com/homes/33012_rb/`;
 
 const REQUEST_HEADERS = {
   "User-Agent":
@@ -15,65 +14,79 @@ const REQUEST_HEADERS = {
   TE: "trailers",
 };
 
-axios
-  .get(url, {
-    headers: {
-      ...REQUEST_HEADERS,
-    },
-  })
-  .then((response) => {
-    const $ = cheerio.load(response.data);
-    const listings: Listing[] = [];
+const zip_codes = zipcodes.lookupByName("Miami", "FL");
 
-    $(".ListItem-c11n-8-84-0__sc-10e22w8-0").each((_, element) => {
-      const listing = <Listing>{};
+for (let i = 0; i < 3; i++) {
 
-      const $el = $(element).find('[data-test="property-card-price"]');
-      const listing_price = $el.text().trim();
+  const url = `https://www.zillow.com/homes/${zip_codes[i].zip}_rb/`;
+  axios
+    .get(url, {
+      headers: {
+        ...REQUEST_HEADERS,
+      },
+    })
+    .then((response) => {
+      const $ = cheerio.load(response.data);
+      const listings: Listing[] = [];
 
-      if (listing_price === "") return;
+      $(".ListItem-c11n-8-84-0__sc-10e22w8-0").each((_, element) => {
+        const listing = <Listing>{};
 
-      const $card = $(element).find('.StyledPropertyCardHomeDetailsList-c11n-8-84-0__sc-1xvdaej-0');
+        const $el = $(element).find('[data-test="property-card-price"]');
+        const listing_price = $el.text().trim();
 
-      $card.find("li").each((i, e) => {
-        const val = $(e).text().trim();
+        if (listing_price === "") return;
 
-        switch(i) {
-          case 0:
-            listing.beds = Number(val.split(" bds")[0]);
-            break;
-          case 1:
-            listing.bathrooms = Number(val.split(" ba")[0]);
-            break;
-          case 2:
-            listing.sqft = Number(val.split(" sqft")[0].split(",").join(""));
-        }
-      })
+        const $card = $(element).find(
+          ".StyledPropertyCardHomeDetailsList-c11n-8-84-0__sc-1xvdaej-0"
+        );
 
-      listing.price = Number(listing_price.match(/\d+/g)?.join(""));
+        $card.find("li").each((i, e) => {
+          const val = $(e).text().trim();
 
-      const addr = $(element).find('[data-test="property-card-addr"]').text().trim().split(",");
-
-      const [__, state, zip_code] = addr[2].split(" ");
-      
-      const address = <Address>{
-        address_line_one: addr[0],
-        zip_code: {
-          zip_code: zip_code,
-          city: {
-            name: addr[1],
-            state: {
-              name: state,
-            }
+          switch (i) {
+            case 0:
+              listing.beds = Number(val.split(" bds")[0]);
+              break;
+            case 1:
+              listing.bathrooms = Number(val.split(" ba")[0]);
+              break;
+            case 2:
+              listing.sqft = Number(val.split(" sqft")[0].split(",").join(""));
           }
-        }
-      };
+        });
 
-      listing.address = address;
+        listing.price = Number(listing_price.match(/\d+/g)?.join(""));
 
-      listings.push(listing);
+        const addr = $(element)
+          .find('[data-test="property-card-addr"]')
+          .text()
+          .trim()
+          .split(",");
+
+        const [__, state, zip_code] = addr[2].split(" ");
+
+        const address = <Address>{
+          address_line_one: addr[0],
+          zip_code: {
+            zip_code: zip_code,
+            city: {
+              name: addr[1],
+              state: {
+                name: state,
+              },
+            },
+          },
+        };
+
+        listing.address = address;
+
+        listings.push(listing);
+      });
+
+      console.log(listings);
+    })
+    .catch((error) => {
+      console.log(error);
     });
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+}
