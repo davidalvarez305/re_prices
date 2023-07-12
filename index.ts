@@ -2,6 +2,10 @@ import zipcodes from "zipcodes";
 import { Builder, By, WebDriver, WebElement } from "selenium-webdriver";
 import firefox from "selenium-webdriver/firefox";
 
+async function scrollTop(driver: WebDriver) {
+  await driver.executeScript(`document.getElementById('search-page-list-container').scrollTo(0, 0)`)
+}
+
 async function scrollPage(driver: WebDriver) {
   let prev = 0;
   for (let i = 500; i < 3000; i += 500) {
@@ -21,8 +25,7 @@ async function getListingDetails(element: WebElement): Promise<Listing> {
   const listing = <Listing>{};
 
   try {
-    const el = await element.findElement(By.css('[data-test="property-card-price"]'));
-    const listing_price = await el.getText();
+    const listing_price = await element.findElement(By.css('[data-test="property-card-price"]')).getText();
 
     if (listing_price === "") throw new Error('Could not find price.');
 
@@ -102,6 +105,8 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     await driver.get(url);
 
     await scrollPage(driver);
+
+    await scrollTop(driver);
 
     const properties: Listing[] = [];
 
