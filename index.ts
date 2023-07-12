@@ -25,13 +25,14 @@ async function getListingDetails(element: WebElement): Promise<Listing> {
   const listing = <Listing>{};
 
   try {
-    const listing_price = await element.findElement(By.css('[data-test="property-card-price"]')).getText();
+    const listing_price = await element.findElement(By.xpath('./span[@data-test="property-card-price"]')).getText();
+    console.log('listing_price: ', listing_price);
 
     if (listing_price === "") throw new Error('Could not find price.');
 
-    const card = await element.findElement(By.css('[data-test="property-card"]'));
+    const card = await element.findElement(By.xpath('./div[@data-test="property-card"]'));
 
-    const forSale = await element.findElement(By.css(".StyledPropertyCardDataArea-c11n-8-89-0__sc-yipmu-0")).getText();
+    const forSale = await element.findElement(By.xpath('./div[@class="StyledPropertyCardDataArea*"]')).getText();
 
     let typeOfProperty = forSale.split("-")[1].split(" for ")[0].trim();
 
@@ -106,7 +107,7 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
 
     await scrollPage(driver);
 
-    await scrollTop(driver);
+    // await scrollTop(driver);
 
     const properties: Listing[] = [];
 
@@ -117,13 +118,14 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     if (!grid) return [];
 
     const listings = await grid.findElements(By.css("li"));
+    console.log(`${listings.length} listings found.`);
 
     for (const element of listings) {
       try {
         const listing = await getListingDetails(element);
         properties.push(listing);
       } catch (err) {
-        console.log(err);
+        // console.log('Error crawling listing.');
       }
     }
 
