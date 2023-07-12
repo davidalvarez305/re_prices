@@ -26,12 +26,11 @@ async function getListingDetails(element: WebElement): Promise<Listing> {
 
     if (listing_price === "") throw new Error('Could not find price.');
 
-    const card = await element.findElement(By.css(".StyledPropertyCardDataWrapper-c11n-8-84-0__sc-1omp4c3-0"));
+    const card = await element.findElement(By.css('[data-test="property-card"]'));
 
-    const forSale = await element.findElement(By.css(".StyledPropertyCardDataArea-c11n-8-84-0__sc-yipmu-0.exsYeB")).getText();
+    const forSale = await element.findElement(By.css(".StyledPropertyCardDataArea-c11n-8-89-0__sc-yipmu-0")).getText();
 
-    let typeOfProperty = "";
-    typeOfProperty = forSale.split("-")[1].split(" for ")[0].trim();
+    let typeOfProperty = forSale.split("-")[1].split(" for ")[0].trim();
 
     const details = await card.findElements(By.css("li"));
 
@@ -115,8 +114,12 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     const listings = await grid.findElements(By.css("li"));
 
     for (const element of listings) {
-      const listing = await getListingDetails(element);
-      properties.push(listing);
+      try {
+        const listing = await getListingDetails(element);
+        properties.push(listing);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     const pagination = await driver.findElement(By.css('a[title="Next page"]'));
