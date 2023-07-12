@@ -2,6 +2,22 @@ import zipcodes from "zipcodes";
 import { Builder, By, WebDriver, WebElement } from "selenium-webdriver";
 import firefox from "selenium-webdriver/firefox";
 
+async function getPriceCut(element: WebElement): Promise<number> {
+  let cut = 0;
+  try {
+    const data = await element.findElement(By.css("span.StyledPropertyCardBadge-c11n-8-89-0__sc-6gojrl-0"));
+    const val = await data.getText();
+
+    if (!val.includes("Price cut:")) console.log('No price cut found.');
+
+    cut = Number(val.split("Price cut:")[1].split(" ")[1].match(/\d+/g)?.join(""));
+  } catch (err) {
+    console.log('Error getting price cut: ', err);
+  } finally {
+    return cut;
+  }
+}
+
 async function scrollTop(driver: WebDriver) {
   await driver.executeScript(`document.getElementById('search-page-list-container').scrollTo(0, 0)`)
 }
@@ -25,14 +41,13 @@ async function getListingDetails(element: WebElement): Promise<Listing> {
   const listing = <Listing>{};
 
   try {
-    const listing_price = await element.findElement(By.xpath('./span[@data-test="property-card-price"]')).getText();
-    console.log('listing_price: ', listing_price);
+    const listing_price = await element.findElement(By.css('[data-test="property-card-price"]')).getText();
 
     if (listing_price === "") throw new Error('Could not find price.');
 
-    const card = await element.findElement(By.xpath('./div[@data-test="property-card"]'));
+    const card = await element.findElement(By.css('[data-test="property-card"]'));
 
-    const forSale = await element.findElement(By.xpath('./div[@class="StyledPropertyCardDataArea*"]')).getText();
+    const forSale = await element.findElement(By.css('div.StyledPropertyCardDataArea-c11n-8-89-0__sc-yipmu-0.eLdkcJ')).getText();
 
     let typeOfProperty = forSale.split("-")[1].split(" for ")[0].trim();
 
@@ -76,25 +91,13 @@ async function getListingDetails(element: WebElement): Promise<Listing> {
 
     listing.address = address;
 
-    let price_cut = 0;
-
-    try {
-      const data = await element.findElement(By.className("StyledPropertyCardBadge-c11n-8-84-0__sc-6gojrl-0"));
-      const val = await data.getText();
-
-      if (val.includes("Price cut:")) {
-        const cut = Number(val.split("Price cut:")[1].split(" ")[1].match(/\d+/g)?.join(""));
-        price_cut = cut;
-      }
-    } catch (err) {
-      throw new Error(err as any);
-    }
+    let price_cut = await getPriceCut(element);
 
     listing.property_type = {
       type: typeOfProperty,
     };
 
-    listing.price_cut = price_cut;
+    if (price_cut) listing.price_cut = price_cut;
     return listing;
   } catch (err) {
     throw new Error(err as any);
@@ -123,9 +126,10 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     for (const element of listings) {
       try {
         const listing = await getListingDetails(element);
+        console.log('listing: ', listing);
         properties.push(listing);
       } catch (err) {
-        // console.log('Error crawling listing.');
+        console.log(err);
       }
     }
 
