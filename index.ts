@@ -129,7 +129,7 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
         console.log('listing: ', listing);
         properties.push(listing);
       } catch (err) {
-        console.log(err);
+        console.log('Not a listing.');
       }
     }
 
