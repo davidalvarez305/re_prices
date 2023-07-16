@@ -25,15 +25,18 @@ async function scrollTop(driver: WebDriver) {
 async function scrollPage(driver: WebDriver) {
   let prev = 0;
   for (let i = 500; i < 3000; i += 500) {
-    // Scroll to the bottom of the page
-    await driver.executeScript(`document.getElementById('search-page-list-container').scrollBy(${prev}, ${i})`);
+    try {
+      // Scroll to the bottom of the page
+      await driver.executeScript(`document.getElementById('search-page-list-container').scrollBy(${prev}, ${i})`);
 
-    // Wait for a brief moment (optional)
-    await driver.sleep(1000);
+      // Wait for a brief moment (optional)
+      await driver.sleep(1000);
 
-    prev = i;
+      prev = i;
 
-    console.log(i);
+    } catch (err) {
+      // Do something here
+    }
   }
 }
 
@@ -97,7 +100,7 @@ async function getListingDetails(element: WebElement): Promise<Listing> {
       type: typeOfProperty,
     };
 
-    if (price_cut) listing.price_cut = price_cut;
+    listing.price_cut = price_cut;
     return listing;
   } catch (err) {
     throw new Error(err as any);
@@ -126,10 +129,9 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     for (const element of listings) {
       try {
         const listing = await getListingDetails(element);
-        console.log('listing: ', listing);
         properties.push(listing);
       } catch (err) {
-        console.log('Not a listing.');
+        // Do something here
       }
     }
 
@@ -149,7 +151,8 @@ async function main() {
   // Create a new WebDriver instance (make sure you have the appropriate driver executable installed)
   // Set Firefox options
   const options = new firefox.Options();
-  // options.headless();
+  options.addArguments('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36')
+  options.headless();
 
   // Create a new WebDriver instance
   const driver = await new Builder()
@@ -157,15 +160,23 @@ async function main() {
     .forBrowser("firefox")
     .build();
 
-  try {
-    // const zip_codes = zipcodes.lookupByName("Miami", "FL");
-    const url = "https://www.zillow.com/hialeah-fl-33016/";
 
-    const listings = await getPrices(driver, url);
-    console.log(listings.length);
-  } finally {
-    // await driver.close();
+  const zip_codes = zipcodes.lookupByName("Miami", "FL");
+  let prices: Listing[] = [];
+  for (let i = 0; i < 4; i++) {
+    try {
+      const url = `https://www.zillow.com/homes/${zip_codes[i].zip}_rb/`;
+
+      const listings = await getPrices(driver, url);
+      prices = [...prices, ...listings];
+
+      console.log(`AMOUNT OF LISTINGS CRAWLED: ${prices.length}`)
+    } catch (err) {
+      console.error('Error crawling: ', err);
+    }
   }
+
+  // await driver.close();
 }
 
 main();
