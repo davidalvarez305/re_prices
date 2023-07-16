@@ -1,6 +1,42 @@
 import zipcodes from "zipcodes";
-import { Builder, By, WebDriver, WebElement } from "selenium-webdriver";
+import { until, Builder, By, Key, WebDriver, WebElement } from "selenium-webdriver";
 import firefox from "selenium-webdriver/firefox";
+import "dotenv/config";
+
+async function handlePressAndHold(driver: WebDriver) {
+  console.log('Handling click and hold...');
+  try {
+    let element: WebElement | null = null;
+
+    // Wait for the element to be present
+    const elements = await driver.findElements(By.css('div'));
+    console.log(`${elements.length} elements found.`);
+
+    for (const currentElement of elements) {
+      const divRole = await currentElement.getAttribute('role');
+
+      if (!divRole) continue;
+
+      if (divRole.includes('button')) {
+        element = currentElement
+        break;
+      };
+    }
+
+    if (!element) throw new Error('Could not find press button.');
+
+    // Perform a click and hold action
+    await driver.actions().move({ origin: element }).press().perform();
+
+    // Wait for 10 seconds
+    await driver.sleep(10000);
+
+    // Release the click
+    await driver.actions().release().perform();
+  } catch (err) {
+    console.error('FAILED TO CLICK AND HOLD: ', err);
+  }
+}
 
 async function getPriceCut(element: WebElement): Promise<number> {
   let cut = 0;
@@ -8,9 +44,8 @@ async function getPriceCut(element: WebElement): Promise<number> {
     const data = await element.findElement(By.css("span.StyledPropertyCardBadge-c11n-8-89-0__sc-6gojrl-0"));
     const val = await data.getText();
 
-    if (!val.includes("Price cut:")) console.log('No price cut found.');
+    if (val.includes("Price cut:")) cut = Number(val.split("Price cut:")[1].split(" ")[1].match(/\d+/g)?.join(""));
 
-    cut = Number(val.split("Price cut:")[1].split(" ")[1].match(/\d+/g)?.join(""));
   } catch (err) {
     console.log('Error getting price cut: ', cut);
   } finally {
@@ -143,25 +178,30 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     await driver.sleep(3000);
     return properties;
   } catch (err) {
-    // Do something later...
+    handlePressAndHold(driver);
   } finally {
     return properties;
   }
 }
 
 async function main() {
-  // Create a new WebDriver instance (make sure you have the appropriate driver executable installed)
-  // Set Firefox options
-  const options = new firefox.Options();
-  options.addArguments('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36')
-  options.headless();
+  // Create a Firefox profile
+  const options = new firefox.Options()
+
+  // Set the desired user agent
+  // options.setPreference('general.useragent.override', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36');
+
+  // Set the desired IP address using a proxy server
+  options.setPreference('network.proxy.type', 1);
+  options.setPreference('network.proxy.http', process.env.PROXY_HOST || "");
+  options.setPreference('network.proxy.http_port', process.env.PROXY_PORT || "");
+  // options.headless();
 
   // Create a new WebDriver instance
   const driver = await new Builder()
     .setFirefoxOptions(options)
     .forBrowser("firefox")
     .build();
-
 
   const zip_codes = zipcodes.lookupByName("Miami", "FL");
   let prices: Listing[] = [];
@@ -172,7 +212,7 @@ async function main() {
       const listings = await getPrices(driver, url);
       prices = [...prices, ...listings];
     } catch (err) {
-      console.error('Error crawling: ', err);
+      // Do something here
     }
   }
 
