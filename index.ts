@@ -12,7 +12,7 @@ async function getPriceCut(element: WebElement): Promise<number> {
 
     cut = Number(val.split("Price cut:")[1].split(" ")[1].match(/\d+/g)?.join(""));
   } catch (err) {
-    console.log('Error getting price cut: ', err);
+    console.log('Error getting price cut: ', cut);
   } finally {
     return cut;
   }
@@ -128,6 +128,7 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     for (const element of listings) {
       try {
         const listing = await getListingDetails(element);
+        console.log(listing);
         properties.push(listing);
       } catch (err) {
         // Do something here
@@ -142,7 +143,7 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     await driver.sleep(3000);
     return properties;
   } catch (err) {
-    console.error("ERROR CRAWLING: ", err);
+    // Do something later...
   } finally {
     return properties;
   }
