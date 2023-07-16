@@ -108,14 +108,13 @@ async function getListingDetails(element: WebElement): Promise<Listing> {
 }
 
 async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
+  const properties: Listing[] = [];
   try {
     await driver.get(url);
 
     await scrollPage(driver);
 
     // await scrollTop(driver);
-
-    const properties: Listing[] = [];
 
     // Find elements with the specified class
     const grid = await driver.findElement(By.id("grid-search-results"));
@@ -143,7 +142,9 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     await driver.sleep(3000);
     return properties;
   } catch (err) {
-    throw new Error(err as any);
+    console.error("ERROR CRAWLING: ", err);
+  } finally {
+    return properties;
   }
 }
 
@@ -169,12 +170,12 @@ async function main() {
 
       const listings = await getPrices(driver, url);
       prices = [...prices, ...listings];
-
-      console.log(`AMOUNT OF LISTINGS CRAWLED: ${prices.length}`)
     } catch (err) {
       console.error('Error crawling: ', err);
     }
   }
+
+  console.log(`AMOUNT OF LISTINGS CRAWLED: ${prices.length}`)
 
   // await driver.close();
 }
