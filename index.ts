@@ -1,5 +1,5 @@
 import zipcodes from "zipcodes";
-import { until, Builder, By, Key, WebDriver, WebElement } from "selenium-webdriver";
+import { Builder, By, WebDriver, WebElement } from "selenium-webdriver";
 import firefox from "selenium-webdriver/firefox";
 import "dotenv/config";
 
