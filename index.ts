@@ -6,32 +6,22 @@ import "dotenv/config";
 async function handlePressAndHold(driver: WebDriver) {
   console.log('Handling click and hold...');
   try {
-    let element: WebElement | null = null;
+    // Get the size of the viewport
+    const { width, height } = await driver.manage().window().getRect();
 
-    // Wait for the element to be present
-    const elements = await driver.findElements(By.css('div'));
-    console.log(`${elements.length} elements found.`);
+    // Calculate the middle coordinates
+    const middleX = width / 2;
+    const middleY = height / 2;
 
-    for (const currentElement of elements) {
-      const divRole = await currentElement.getAttribute('role');
+    // Move the mouse to the middle of the screen
+    await driver.actions().move({ x: middleX, y: middleY }).perform();
 
-      if (!divRole) continue;
+    // Press and hold the mouse for 15 seconds
+    await driver.actions().press().perform();
 
-      if (divRole.includes('button')) {
-        element = currentElement
-        break;
-      };
-    }
+    // Wait for 15 seconds
+    await driver.sleep(15000);
 
-    if (!element) throw new Error('Could not find press button.');
-
-    // Perform a click and hold action
-    await driver.actions().move({ origin: element }).press().perform();
-
-    // Wait for 10 seconds
-    await driver.sleep(10000);
-
-    // Release the click
     await driver.actions().release().perform();
   } catch (err) {
     console.error('FAILED TO CLICK AND HOLD: ', err);
@@ -178,7 +168,11 @@ async function getPrices(driver: WebDriver, url: string): Promise<Listing[]> {
     await driver.sleep(3000);
     return properties;
   } catch (err) {
-    handlePressAndHold(driver);
+    console.log('Waiting 5 seconds for press and hold...');
+    await driver.sleep(5000);
+    await handlePressAndHold(driver);
+    console.log('Waiting 5 seconds after press and hold...');
+    await driver.sleep(5000);
   } finally {
     return properties;
   }
