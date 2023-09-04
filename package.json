@@ -24,7 +24,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "axios": "^0.25.0",
+    "axios": "^1.5.0",
     "cheerio": "^1.0.0-rc.12",
     "chromedriver": "^114.0.2",
     "cron": "^1.8.2",
@@ -32,7 +32,7 @@
     "pg": "^8.7.1",
     "reflect-metadata": "^0.1.13",
     "selenium-webdriver": "^4.10.0",
-    "typeorm": "^0.3.6",
+    "typeorm": "^0.3.17",
     "zipcodes": "^8.0.0"
   }
 }
