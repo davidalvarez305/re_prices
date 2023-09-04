@@ -1,5 +1,5 @@
-import { Entry, ListingStatus, Property, PropertyType } from "entities";
-import { ListResult } from "types";
+import { Entry, ListingStatus, Property, PropertyType } from "./entities";
+import { ListResult } from "./types";
 import { DBContext } from "./db";
 
 export async function createPropertyTypeFactory(
@@ -48,7 +48,9 @@ export async function createPropertyFactory(
   try {
     const propertyRepo = DBContext.getRepository(Property);
     const existingPropterty = await propertyRepo.findOne({
-      zpid: listing.zpid,
+      where: {
+        zpid: listing.zpid,
+      },
     });
     if (existingPropterty) return existingPropterty;
 

@@ -10,7 +10,7 @@ export class Property {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   zpid: string;
 
   @Column({ nullable: true })
@@ -61,7 +61,7 @@ export class Entry {
   @Column({ type: "decimal", precision: 10, scale: 2 })
   price: number;
 
-  @Column()
+  @Column({ nullable: true })
   datePriceChanged: number;
 
   @Column(() => ListingStatus)
