@@ -3,9 +3,12 @@ import "dotenv/config";
 import axios from "axios";
 import cheerio from "cheerio";
 import { NextDataObject } from "types";
-import { Listing } from "entities";
+import { Entry, Property } from "entities";
+import { DBContext } from "db";
 
 async function main() {
+  // DBContext.initialize().catch(console.error);
+
   try {
     const axiosConfig = {
       headers: {
@@ -30,7 +33,7 @@ async function main() {
 
     if (!nextDataScript) throw new Error("__NEXT_DATA__ not found.");
 
-    const crawledListings: Listing[] = [];
+    const entries: Entry[] = [];
 
     const nextDataObject: NextDataObject = JSON.parse(nextDataScript);
     const listings =
@@ -38,7 +41,8 @@ async function main() {
         .listResults;
 
     listings.forEach((listing) => {
-      const current: Partial<Listing> = {};
+      const property: Property = {};
+      const current: Partial<Entry> = {};
 
       current.bathrooms = listing.baths || undefined;
       current.beds = listing.beds || undefined;

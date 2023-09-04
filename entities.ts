@@ -8,7 +8,52 @@ import {
 } from "typeorm";
 
 @Entity()
-export class Listing {
+export class Property {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  zpid: string;
+
+  @Column({ nullable: true })
+  beds: number | null;
+
+  @Column({ nullable: true })
+  bathrooms: number | null;
+
+  @Column({ nullable: true })
+  sqft: number | null;
+
+  @Column({ nullable: true })
+  latitude: number | null;
+
+  @Column({ nullable: true })
+  longitude: number | null;
+
+  @Column()
+  address_line_one: string;
+
+  @Column({ nullable: true })
+  address_line_two?: string;
+
+  @Column()
+  zip_code: string;
+
+  @Column()
+  city: string;
+
+  @Column()
+  state: string;
+
+  @Column(() => PropertyType)
+  property_type: PropertyType;
+
+  @OneToMany(() => Entry, (entry) => entry.property)
+  entries: Entry[];
+}
+
+@Entity()
+export class Entry {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -19,88 +64,16 @@ export class Listing {
   price: number;
 
   @Column()
-  beds: number;
-
-  @Column()
-  bathrooms: number;
-
-  @Column()
-  sqft: number;
-
-  @Column()
-  latitude: number;
-
-  @Column()
-  longitude: number;
-
-  @Column()
   datePriceChanged: number;
-
-  @Column(() => Address)
-  address: Address;
-
-  @Column(() => PropertyType)
-  property_type: PropertyType;
 
   @Column(() => ListingStatus)
   listing_status: ListingStatus;
 
   @Column({ type: "decimal", precision: 10, scale: 2 })
   price_cut: number;
-}
 
-@Entity()
-export class State {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  name: string;
-
-  @OneToMany(() => City, (city) => city.state)
-  cities: City[];
-}
-
-@Entity()
-export class City {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  name: string;
-
-  @ManyToOne(() => State, (state) => state.cities)
-  state: State;
-
-  @OneToMany(() => ZipCode, (zipCode) => zipCode.city)
-  zipCodes: ZipCode[];
-}
-
-@Entity()
-export class ZipCode {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  zip_code: string;
-
-  @ManyToOne(() => City, (city) => city.zipCodes)
-  city: City;
-}
-
-@Entity()
-export class Address {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  address_line_one: string;
-
-  @Column({ nullable: true })
-  address_line_two?: string;
-
-  @OneToOne(() => ZipCode)
-  zip_code: ZipCode;
+  @Column(() => Property)
+  property: Property;
 }
 
 @Entity()
