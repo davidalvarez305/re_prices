@@ -12,6 +12,9 @@ export class Listing {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  dateCrawled: number;
+
   @Column({ type: "decimal", precision: 10, scale: 2 })
   price: number;
 
@@ -23,6 +26,15 @@ export class Listing {
 
   @Column()
   sqft: number;
+
+  @Column()
+  latitude: number;
+
+  @Column()
+  longitude: number;
+
+  @Column()
+  datePriceChanged: number;
 
   @Column(() => Address)
   address: Address;
@@ -83,6 +95,9 @@ export class Address {
 
   @Column()
   address_line_one: string;
+
+  @Column({ nullable: true })
+  address_line_two?: string;
 
   @OneToOne(() => ZipCode)
   zip_code: ZipCode;

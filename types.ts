@@ -51,9 +51,9 @@ export interface AnalyticsConfig {
 
 export interface Dimensions {
   dimension66: string;
-  dimension3: Dimension3;
+  dimension3: string;
   dimension4: string;
-  dimension5: Dimension5;
+  dimension5: string;
   dimension6: string;
   dimension146: string;
   dimension25: string;
@@ -65,14 +65,6 @@ export interface Dimensions {
   dimension70: string;
   dimension18: string;
   dimension71: string;
-}
-
-export enum Dimension3 {
-  FL = "FL",
-}
-
-export enum Dimension5 {
-  Hialeah = "Hialeah",
 }
 
 export interface AutocompleteConfig {
@@ -137,10 +129,10 @@ export interface Targets {
   guid: string;
   vers: string;
   premieragent: string;
-  state: Dimension3;
+  state: string;
   dma: string;
   cnty: string;
-  city: Dimension5;
+  city: string;
   zip: string;
   agentnavads: string;
   mlat: string;
@@ -183,8 +175,8 @@ export interface ListResult {
   isBuilding?: boolean;
   address: string;
   addressStreet: string;
-  addressState: Dimension3;
-  addressCity: Dimension5;
+  addressState: string;
+  addressCity: string;
   addressZipcode: string;
   providerListingId: string;
   availabilityCount?: number;
@@ -228,8 +220,8 @@ export interface HomeInfo {
   zpid: number;
   streetAddress: string;
   zipcode: string;
-  city: Dimension5;
-  state: Dimension3;
+  city: string;
+  state: string;
   latitude?: number;
   longitude?: number;
   price: number;
@@ -260,6 +252,8 @@ export interface HomeInfo {
   datePriceChanged?: number;
   priceReduction?: string;
   priceChange?: number;
+  lotAreaUnit?: string;
+  lotAreaValue?: number;
 }
 
 export enum Country {
@@ -319,8 +313,8 @@ export interface RelaxedResult {
   unformattedPrice: number;
   address: string;
   addressStreet: string;
-  addressCity: Dimension5;
-  addressState: Dimension3;
+  addressCity: string;
+  addressState: string;
   addressZipcode: string;
   isUndisclosedAddress: boolean;
   beds: number;
@@ -1172,9 +1166,9 @@ export interface GtmInitialDatum {
 }
 
 export interface GaCustomDimensions {
-  dimension3: Dimension3;
+  dimension3: string;
   dimension4: string;
-  dimension5: Dimension5;
+  dimension5: string;
   dimension6: string;
   dimension18: string;
   dimension23: string;
