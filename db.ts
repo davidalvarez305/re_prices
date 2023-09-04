@@ -1,15 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import {
-  Property,
-  Entry,
-  Address,
-  City,
-  State,
-  ZipCode,
-  PropertyType,
-  ListingStatus,
-} from "./entities";
+import { Property, Entry, PropertyType, ListingStatus } from "./entities";
 
 // Initialize PostgreSQL
 export const DBContext = new DataSource({
@@ -20,14 +11,5 @@ export const DBContext = new DataSource({
   port: Number(process.env.POSTGRES_PORT) || 5432,
   host: process.env.POSTGRES_HOST,
   synchronize: true,
-  entities: [
-    Property,
-    Entry,
-    Address,
-    City,
-    State,
-    ZipCode,
-    PropertyType,
-    ListingStatus,
-  ],
+  entities: [Property, Entry, PropertyType, ListingStatus],
 });

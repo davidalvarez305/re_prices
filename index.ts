@@ -3,18 +3,27 @@ import "dotenv/config";
 import axios from "axios";
 import cheerio from "cheerio";
 import { NextDataObject } from "types";
-import { Entry, Property } from "entities";
+import { Entry } from "entities";
+import { createEntryFactory, createPropertyFactory, saveEntries } from "utils";
 import { DBContext } from "db";
 
 async function main() {
-  // DBContext.initialize().catch(console.error);
-
   try {
+    DBContext.initialize();
     const axiosConfig = {
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0",
         "Content-Type": "text/html",
+      },
+      proxy: {
+        protocol: "http",
+        host: String(process.env.HOST),
+        port: Number(process.env.PORT),
+        auth: {
+          username: String(process.env.USERNAME),
+          password: String(process.env.PASSWORD),
+        },
       },
     };
     const response = await axios.get(
@@ -33,45 +42,27 @@ async function main() {
 
     if (!nextDataScript) throw new Error("__NEXT_DATA__ not found.");
 
-    const entries: Entry[] = [];
+    const entries: Partial<Entry>[] = [];
 
     const nextDataObject: NextDataObject = JSON.parse(nextDataScript);
     const listings =
       nextDataObject.props.pageProps.searchPageState.cat1.searchResults
         .listResults;
 
-    listings.forEach((listing) => {
-      const property: Property = {};
-      const current: Partial<Entry> = {};
+    for (let i = 0; i < listings.length; i++) {
+      const listing = listings[i];
 
-      current.bathrooms = listing.baths || undefined;
-      current.beds = listing.beds || undefined;
-      current.price = listing.unformattedPrice;
-      current.latitude = listing.latLong.latitude;
-      current.longitude = listing.latLong.longitude;
-      current.sqft = listing.hdpData?.homeInfo.lotAreaValue;
-      current.datePriceChanged = listing.hdpData?.homeInfo.datePriceChanged;
-      current.dateCrawled = new Date().getTime();
+      try {
+        const property = await createPropertyFactory(listing);
+        const entry = await createEntryFactory(listing, property);
 
-      current.address = {
-        address_line_one: listing.addressStreet,
-        address_line_two: listing.hdpData?.homeInfo.unit,
-        zip_code: {
-          zip_code: listing.addressZipcode,
-          city: {
-            name: listing.addressCity,
-            state: { name: listing.addressState },
-          },
-        },
-      };
+        entries.push(entry);
+      } catch (err) {
+        console.error(`Failed to create entry: `, err);
+      }
+    }
 
-      current.listing_status = { status: listing.hdpData?.homeInfo.homeStatus || "" };
-      current.property_type = { type: listing.hdpData?.homeInfo.homeType || "" };
-
-      console.log(listing);
-
-      // crawledListings.push(current);
-    });
+    await saveEntries(entries);
   } catch (err) {
     console.error(err);
   }
