@@ -69,6 +69,8 @@ export async function createPropertyFactory(
       property_type: await createPropertyTypeFactory(
         listing.hdpData?.homeInfo.homeType || ""
       ),
+      photos: listing.carouselPhotos.join(", "),
+      detailsUrl: listing.detailUrl
     };
 
     return await propertyRepo.save(property);

@@ -44,6 +44,12 @@ export class Property {
   @Column()
   state: string;
 
+  @Column({ nullable: true })
+  photos: string;
+
+  @Column()
+  detailsUrl: string;
+
   @ManyToOne(() => PropertyType, (property) => property.type)
   property_type: PropertyType;
 

@@ -87,7 +87,7 @@ async function main() {
   }
 
   const zip_codes = zipcodes.lookupByName("Miami", "FL");
-  for (let i = 0; i < zip_codes.length; i++) {
+  for (let i = 0; i < 2; i++) {
     try {
       await getPrices(zip_codes[i].zip);
     } catch (err) {
