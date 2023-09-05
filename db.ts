@@ -14,4 +14,5 @@ export const DBContext = new DataSource({
   entities: [Property, Entry, PropertyType, ListingStatus],
   migrations: ["./migrations/*.ts"],
   synchronize: !__prod__,
+  logging: !__prod__,
 });

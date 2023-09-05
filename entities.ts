@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  ManyToOne,
 } from "typeorm";
 
 @Entity()
@@ -13,20 +14,20 @@ export class Property {
   @Column({ unique: true })
   zpid: string;
 
-  @Column({ nullable: true })
-  beds: number | null;
+  @Column({ nullable: true, type: "numeric", precision: 3, scale: 1 })
+  beds: number
 
-  @Column({ nullable: true })
-  bathrooms: number | null;
+  @Column({ nullable: true, type: "numeric", precision: 3, scale: 1 })
+  bathrooms: number
 
-  @Column({ nullable: true })
-  sqft: number | null;
+  @Column({ nullable: true, type: "numeric", precision: 16, scale: 10 })
+  sqft: number;
 
-  @Column({ nullable: true })
-  latitude: number | null;
+  @Column({ nullable: true, type: "numeric", precision: 16, scale: 10 })
+  latitude: number
 
-  @Column({ nullable: true })
-  longitude: number | null;
+  @Column({ nullable: true, type: "numeric", precision: 16, scale: 10 })
+  longitude: number
 
   @Column()
   address_line_one: string;
@@ -43,7 +44,7 @@ export class Property {
   @Column()
   state: string;
 
-  @Column(() => PropertyType)
+  @ManyToOne(() => PropertyType, (property) => property.type)
   property_type: PropertyType;
 
   @OneToMany(() => Entry, (entry) => entry.property)
@@ -55,22 +56,22 @@ export class Entry {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'bigint' })
   dateCrawled: number;
 
-  @Column({ type: "decimal", precision: 10, scale: 2 })
+  @Column({ type: "decimal", precision: 16, scale: 2 })
   price: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'bigint' })
   datePriceChanged: number;
 
-  @Column(() => ListingStatus)
+  @ManyToOne(() => ListingStatus, (status) => status.status)
   listing_status: ListingStatus;
 
-  @Column({ type: "decimal", precision: 10, scale: 2 })
+  @Column({ nullable: true, type: "decimal", precision: 16, scale: 2 })
   price_cut: number;
 
-  @Column(() => Property)
+  @ManyToOne(() => Property, (property) => property.entries)
   property: Property;
 }
 

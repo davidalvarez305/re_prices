@@ -56,11 +56,11 @@ export async function createPropertyFactory(
 
     const property: Partial<Property> = {
       zpid: listing.zpid,
-      bathrooms: listing.baths || null,
-      beds: listing.beds || null,
-      latitude: listing.latLong.latitude || null,
-      longitude: listing.latLong.longitude || null,
-      sqft: listing.hdpData?.homeInfo.lotAreaValue || null,
+      bathrooms: listing.baths || 0,
+      beds: listing.beds || 0,
+      latitude: listing.latLong.latitude || 0,
+      longitude: listing.latLong.longitude || 0,
+      sqft: listing.hdpData?.homeInfo.lotAreaValue || 0,
       address_line_one: listing.addressStreet,
       address_line_two: listing.hdpData?.homeInfo.unit,
       zip_code: listing.addressZipcode,
