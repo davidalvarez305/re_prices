@@ -66,9 +66,7 @@ export async function createPropertyFactory(
       zip_code: listing.addressZipcode,
       city: listing.addressCity,
       state: listing.addressState,
-      property_type: await createPropertyTypeFactory(
-        listing.hdpData?.homeInfo.homeType || ""
-      ),
+      property_type: await createPropertyTypeFactory(listing.hdpData?.homeInfo.homeType || ""),
       photos: listing.carouselPhotos.join(", "),
       detailsUrl: listing.detailUrl
     };
